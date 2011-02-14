@@ -1,0 +1,12 @@
+GEM
+  remote: http://gemcutter.org/
+  specs:
+    config_context (0.0.1)
+    mocha (0.9.12)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  config_context
+  mocha
