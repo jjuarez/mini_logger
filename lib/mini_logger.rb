@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'logger'
-require 'config_context'
 
 
 module MiniLogger
@@ -8,7 +7,7 @@ module MiniLogger
 
     LOG_CHANNEL_KEY       = :log_channel
     LOG_LEVEL_KEY         = :log_level
-    DEFAULT_CONFIGURATION = { LOG_CHANNEL_KEY=>STDERR, LOG_LEVEL_KEY=>::Logger::DEBUG }
+    DEFAULT_CONFIGURATION = { LOG_CHANNEL_KEY=>STDERR, LOG_LEVEL_KEY=>::Logger::INFO }
     VALID_METHODS         = [:debug, :info, :warn, :error, :fatal]
 
 
@@ -21,13 +20,8 @@ module MiniLogger
     
     def configure( options=DEFAULT_CONFIGURATION )
       
-      ConfigContext.configure do |config|
-                    
-        options.keys.each { |property| config[property] = options[property] }
-      end
-      
-      @logger       ||= Logger.new( ConfigContext[LOG_CHANNEL_KEY] )
-      @logger.level ||= ConfigContext[LOG_LEVEL_KEY]
+      @logger       ||= Logger.new( options[LOG_CHANNEL_KEY] )
+      @logger.level ||= options[LOG_LEVEL_KEY]
       
       self
     end
