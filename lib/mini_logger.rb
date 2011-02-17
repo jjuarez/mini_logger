@@ -5,25 +5,29 @@ require 'logger'
 module MiniLogger
   class << self
 
-    LOG_CHANNEL_KEY       = :log_channel
-    LOG_LEVEL_KEY         = :log_level
-    DEFAULT_CONFIGURATION = { LOG_CHANNEL_KEY=>STDERR, LOG_LEVEL_KEY=>::Logger::INFO }
-    VALID_METHODS         = [:debug, :info, :warn, :error, :fatal]
-
+    DEFAULT_CONFIGURATION = { :log_channel=>STDERR, :log_level=>::Logger::INFO }
+    VALID_METHODS         = [ :debug, :info, :warn, :error, :fatal ]
 
     def method_missing( method, *arguments, &block )
 
       self.configure unless @logger
-      @logger.send( method, arguments ) if VALID_METHODS.include?( method )
+      
+      if VALID_METHODS.include?( method )
+      
+        @logger.send( method, arguments.length == 1 ? arguments[0] : arguments ) 
+      end
     end
     
     
-    def configure( options=DEFAULT_CONFIGURATION )
+   #def configure( options=DEFAULT_CONFIGURATION )
+    def configure( atts = DEFAULT_CONFIGURATION )
       
-      @logger       ||= Logger.new( options[LOG_CHANNEL_KEY] )
-      @logger.level ||= options[LOG_LEVEL_KEY]
+      @logger       ||= Logger.new( atts[:log_channel] )
+      @logger.level ||= atts[:log_level]
       
       self
     end
   end
 end
+
+MiniLogger.fatal( "Yeah!!")
