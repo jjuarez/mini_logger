@@ -11,15 +11,9 @@ module MiniLogger
     def method_missing( method, *arguments, &block )
 
       self.configure unless @logger
-      
-      if VALID_METHODS.include?( method )
-      
-        @logger.send( method, arguments.length == 1 ? arguments[0] : arguments ) 
-      end
+      @logger.send( method, arguments.length == 1 ? arguments[0] : arguments ) if VALID_METHODS.include?( method )
     end
     
-    
-   #def configure( options=DEFAULT_CONFIGURATION )
     def configure( atts = DEFAULT_CONFIGURATION )
       
       @logger       ||= Logger.new( atts[:log_channel] )
@@ -29,5 +23,3 @@ module MiniLogger
     end
   end
 end
-
-MiniLogger.fatal( "Yeah!!")

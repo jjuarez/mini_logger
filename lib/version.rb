@@ -1,8 +1,8 @@
 module Version
   module Info
     MAJOR  = 0 
-    MINOR  = 1 
-    PATCH  = 3
+    MINOR  = 1
+    PATCH  = 4
   end
 
   NAME     = 'mini_logger'
