@@ -28,6 +28,7 @@ end
 
 
 task :build =>[:clean] do
+
   begin
     require 'jeweler'
   rescue LoadError => e
@@ -55,7 +56,9 @@ end
 
 
 task :test => [:clean, :build] do 
+
   require 'rake/runtest'
+
   Rake.run_tests 'test/unit/tc_*.rb'
 end
 
