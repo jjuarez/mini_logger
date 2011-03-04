@@ -22,9 +22,9 @@ module MiniLogger
 
     if( VALID_METHODS.include?( method ) )
       if( block_given? )
-        @logger.send( method, arguments, block )
+        @logger.send( method, arguments.length == 1 ? arguments[0] : arguments, block )
       else
-        @logger.send( method, arguments )
+        @logger.send( method, arguments.length == 1 ? arguments[0] : arguments )
       end
     end
   end  
