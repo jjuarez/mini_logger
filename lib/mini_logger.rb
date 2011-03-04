@@ -3,23 +3,29 @@ require 'logger'
 
 
 module MiniLogger
-  class << self
+  extend self
 
-    DEFAULT_CONFIGURATION = { :log_channel=>STDERR, :log_level=>::Logger::INFO }
-    VALID_METHODS         = [ :debug, :info, :warn, :error, :fatal ]
+  DEFAULT_CONFIGURATION = { :log_channel=>STDERR, :log_level=>::Logger::INFO }
+  VALID_METHODS         = [ :debug, :info, :warn, :error, :fatal ]
 
-    def method_missing( method, *arguments, &block )
-
-      self.configure unless @logger
-      @logger.send( method, arguments.length == 1 ? arguments[0] : arguments ) if VALID_METHODS.include?( method )
-    end
+  def configure( atts = DEFAULT_CONFIGURATION )
     
-    def configure( atts = DEFAULT_CONFIGURATION )
-      
-      @logger       ||= Logger.new( atts[:log_channel] )
-      @logger.level ||= atts[:log_level]
-      
-      self
-    end
+    @logger       ||= ::Logger.new( atts[:log_channel] )
+    @logger.level ||= atts[:log_level]
+    
+    self
   end
+
+  def method_missing( method, *arguments, &block )
+
+    self.configure unless @logger
+
+    if( VALID_METHODS.include?( method ) )
+      if( block_given? )
+        @logger.send( method, arguments, block )
+      else
+        @logger.send( method, arguments )
+      end
+    end
+  end  
 end
