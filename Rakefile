@@ -4,7 +4,7 @@ $:.unshift( File.join( File.dirname( __FILE__ ), 'lib' ) )
 begin
   require 'version'
 rescue LoadError => le
-  fail( "You need to declare the NAME and the VERSION of your gem in lib/version.rb file (le.message)" )
+  fail( le.message )
 end
 
 
@@ -15,6 +15,7 @@ rescue LoadError => le
 end
 
 
+desc "Clean all temporary stuffs"
 task :clean do
   
   begin
@@ -27,6 +28,7 @@ task :clean do
 end
 
 
+desc "Build the gem"
 task :build =>[:clean] do
 
   begin
@@ -37,28 +39,26 @@ task :build =>[:clean] do
 
   Jeweler::Tasks.new do |gemspec|
 
-    gemspec.name              = Version::NAME
-    gemspec.version           = Version::INFO
-    gemspec.rubyforge_project = "http://github.com/jjuarez/#{Version::NAME}"
+    gemspec.name              = MiniLogger::Version::NAME
+    gemspec.version           = MiniLogger::Version::VERSION
+    gemspec.rubyforge_project = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
     gemspec.license           = 'MIT'
-    gemspec.summary           = 'A Config Context for little applications'
-    gemspec.description       = 'My config DSL'
+    gemspec.summary           = 'A real simple logger utility'
+    gemspec.description       = 'My tiny logger'
     gemspec.email             = 'javier.juarez@gmail.com'
-    gemspec.homepage          = "http://github.com/jjuarez/#{Version::NAME}"
+    gemspec.homepage          = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
     gemspec.authors           = ['Javier Juarez']
-    gemspec.files             = Dir[ 'lib/**/*.rb' ] + Dir[ 'test/**/*rb' ]
-    
-    gemspec.add_dependency 'config_context'
+    gemspec.files             = Dir[ 'lib/**/*.rb' ] + Dir[ 'test/**/*rb' ]    
   end
 
   Jeweler::GemcutterTasks.new
 end
 
 
+desc "Testing..."
 task :test => [:clean, :build] do 
 
   require 'rake/runtest'
-
   Rake.run_tests 'test/unit/tc_*.rb'
 end
 
