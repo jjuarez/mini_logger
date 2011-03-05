@@ -11,13 +11,9 @@ class TestMiniLogger < Test::Unit::TestCase
   context "A Default Logger" do
     
     setup do
-      MiniLogger.configure( :log_channel=>STDOUT, :log_level=>MiniLogger::DEBUG )
+      MiniLogger.configure( :log_channel=>"/dev/null", :log_level=>MiniLogger::DEBUG )
     end
   
-    should "be level DEBUG" do
-      assert( MiniLogger.debug? )
-    end  
-
     should "write a debug line" do
       assert( MiniLogger.debug( "debug" ) )
     end  
@@ -38,9 +34,24 @@ class TestMiniLogger < Test::Unit::TestCase
       assert( MiniLogger.fatal( "fatal" ) )
     end
 
-    should "change log level" do
-      MiniLogger.level = MiniLogger::ERROR
-      assert_equal( MiniLogger.level, MiniLogger::ERROR )
+    should "log level ERROR" do
+      MiniLogger.configure( :log_level=>MiniLogger::ERROR )
+      assert( MiniLogger.error? )
+    end
+
+    should "log level WARN" do
+      MiniLogger.configure( :log_level=>MiniLogger::WARN )
+      assert( MiniLogger.warn? )
+    end
+
+    should "log level INFO" do
+      MiniLogger.configure( :log_level=>MiniLogger::INFO )
+      assert( MiniLogger.info? )
+    end
+
+    should "log level DEBUG" do
+      MiniLogger.configure( :log_level=>MiniLogger::DEBUG )
+      assert( MiniLogger.debug? )
     end
   end
 end

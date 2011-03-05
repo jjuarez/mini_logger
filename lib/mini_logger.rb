@@ -11,33 +11,18 @@ module MiniLogger
   ERROR = ::Logger::ERROR
   FATAL = ::Logger::FATAL
 
-  DEFAULT_LOGCHANNEL = STDERR
-  DEFAULT_LOGLEVEL   = DEBUG
-  VALID_METHODS      = [ :debug, :info, :warn, :error, :fatal ]
+  DEFAULT_LOGCHANNEL      = STDERR
+  DEFAULT_LOGLEVEL        = DEBUG
+  DEFAULT_DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S"
 
 
   def configure( atts = {} )
     
-    atts[:log_channel] ||= DEFAULT_LOGCHANNEL
-    atts[:log_channel] ||= DEFAULT_LOGLEVEL
-
-    @logger            ||= ::Logger.new( atts[:log_channel] )
-    @logger.level      ||= atts[:log_level]
+    @logger                 ||= ::Logger.new( atts[:log_channel] ? atts[:log_channel] : DEFAULT_LOGCHANNEL )
+    @logger.level           = atts[:log_level] ? atts[:log_level] : DEFAULT_LOGLEVEL
+    @logger.datetime_format = atts[:dt_format] ? atts[:dt_format] : DEFAULT_DATETIME_FORMAT
     
     self
-  end
-
-  def debug?
-    (@logger.level == DEBUG)
-  end
-
-  def level
-    @logger.level
-  end
-
-  
-  def level=( new_level )
-    @logger.level=new_level
   end
 
   
@@ -45,12 +30,15 @@ module MiniLogger
 
     self.configure unless @logger
 
-    if( VALID_METHODS.include?( method ) )
-      if( block_given? )
-        @logger.send( method, arguments.length == 1 ? arguments[0] : arguments, block )
+    return unless( [:debug, :debug?, :info, :info?, :warn, :warn?, :error, :error?, :fatal].include?( method ) )
+
+    case arguments.length
+      when 0
+        @logger.send( method )
+      when 1 
+        @logger.send( method, arguments[0] )
       else
-        @logger.send( method, arguments.length == 1 ? arguments[0] : arguments )
-      end
+        @logger.send( method, arguments )
     end
   end  
 end
