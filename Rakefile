@@ -1,4 +1,4 @@
-$:.unshift( File.join( File.dirname( __FILE__ ), %w[lib mini_logger] ) )
+$:.unshift( File.join( File.dirname( __FILE__ ), 'lib' ) )
 
 
 begin
