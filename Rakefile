@@ -1,4 +1,4 @@
-$:.unshift( File.join( File.dirname( __FILE__ ), 'lib' ) )
+$:.unshift( File.join( File.dirname( __FILE__ ), %w[lib mini_logger] ) )
 
 
 begin
@@ -40,7 +40,7 @@ task :build =>[:clean] do
   Jeweler::Tasks.new do |gemspec|
 
     gemspec.name              = MiniLogger::Version::NAME
-    gemspec.version           = MiniLogger::Version::VERSION
+    gemspec.version           = MiniLogger::Version::NUMBER
     gemspec.rubyforge_project = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
     gemspec.license           = 'MIT'
     gemspec.summary           = 'A real simple logger utility'
@@ -59,7 +59,7 @@ desc "Testing..."
 task :test => [:clean, :build] do 
 
   require 'rake/runtest'
-  Rake.run_tests 'test/unit/tc_*.rb'
+  Rake.run_tests 'test/test_*.rb'
 end
 
 
