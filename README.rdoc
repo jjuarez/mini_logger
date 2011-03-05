@@ -1,11 +1,9 @@
 = Mini Logger: 
 
-
 == Installing
     
-The latest stable version is published in gemcutter.
+The latest stable version is published in rubygems.org.
 
-  gem source --add http://gemcutter.org
   gem install mini_logger
 
 == How to use
@@ -13,10 +11,19 @@ The latest stable version is published in gemcutter.
   require 'rubygems'
   require 'mini_logger'
 
+  ##
+  # Default configuration
   MiniLogger.debug( "This is a debug log line to the stderr channel" )
-   
-== TODO
+  
+  ##
+  # Custom configuration
+  MiniLogger.cofigure( :log_channel => File.join( File.dirname( __FILE__ ), 'log', 'application.log' ), 
+                       :log_level   => MiniLogger::DEBUG )
+  
+  MiniLogger.debug( "#{big_process()}" ) if MiniLogger.debug?
 
+== TODO
+  * ???
   
 == License
 
