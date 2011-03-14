@@ -21,6 +21,7 @@ The latest stable version is published in rubygems.org.
                        :log_level   => MiniLogger::DEBUG )
   
   MiniLogger.debug( "#{big_process()}" ) if MiniLogger.debug?
+  MiniLogger.level = MiniLogger::INFO
 
 == TODO
   * ???
