@@ -14,6 +14,10 @@ class TestMiniLogger < Test::Unit::TestCase
       @mini_logger_debug = MiniLogger.configure( :log_channel=>"/dev/null", :log_level=>MiniLogger::DEBUG )
     end
     
+    should "a info log level" do
+      assert( MiniLogger.configure.info? )
+    end
+    
     should "write a debug line" do
       assert( @mini_logger_debug.debug( "debug" ) )
     end  

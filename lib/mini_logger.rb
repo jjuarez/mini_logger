@@ -5,63 +5,60 @@ require 'logger'
 module MiniLogger
   extend self
     
-  LOG_LEVEL_MAP = {
-    :debug   =>::Logger::DEBUG,
-    :info    =>::Logger::INFO,
-    :warn    =>::Logger::WARN,
-    :error   =>::Logger::ERROR,
-    :faltal  =>::Logger::FATAL
+  LLM = {
+    :debug  =>Logger::DEBUG,
+    :info   =>Logger::INFO,
+    :warn   =>Logger::WARN,
+    :error  =>Logger::ERROR,
+    :faltal =>Logger::FATAL
   }
   
-  DEBUG   = LOG_LEVEL_MAP[:debug]
-  INFO    = LOG_LEVEL_MAP[:info]
-  WARN    = LOG_LEVEL_MAP[:warn]
-  ERROR   = LOG_LEVEL_MAP[:error]
-  FATAL   = LOG_LEVEL_MAP[:fatal]
-
-  DEFAULT_LOGCHANNEL      = STDERR
-  DEFAULT_LOGLEVEL        = LOG_LEVEL_MAP[:info]
-  DEFAULT_DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S"
-
-
-  def configure( atts = {} )
+  DEBUG = :debug
+  INFO  = :info
+  WARN  = :warn
+  ERROR = :error
+  FATAL = :fatal
+  
+  private
+  def validate_log_level?( log_level )
+    LLM.has_key?( log_level )
+  end
+  
+  def get_log_level( log_level )
+    LLM[log_level]
+  end
+  
+  
+  public
+  def configure( atts = { } )
     
-    log_channel = atts[:log_channel] ? atts[:log_channel] : DEFAULT_LOGCHANNEL
-    log_level   = LOG_LEVEL_MAP.has_value?( atts[:log_level] ) ? atts[:log_level] : DEFAULT_LOGLEVEL
-    dt_format   = atts[:dt_format] ? atts[:dt_format] : DEFAULT_DATETIME_FORMAT  
-      
-    @logger                 ||= ::Logger.new( log_channel )
-    @logger.level           ||= log_level
-    @logger.datetime_format ||= dt_format
-    
+    @logger       = Logger.new( atts[:log_channel] ? atts[:log_channel] : STDERR )
+    @logger.level = validate_log_level?( atts[:log_level] ) ? get_log_level( atts[:log_level] ) : Logger::INFO
     self
   end
 
-
-  def level( )
-    self.configure unless @logger
-    
+  def level( ) 
+    @logger || configure
     @logger.level
-  end
-  
+  end  
   
   def level=( new_log_level )
     
-    self.configure unless @logger
-
-    if LOG_LEVEL_MAP.has_value?( new_log_level )
-      @logger.level = new_log_level
-    else
+    @logger || configure
+    
+    if( validate_log_level?( new_log_level ) )
+      @logger.level = get_log_level( new_log_level )
+    else  
       raise ArgumentError.new( "Bad log level: #{new_log_level}" )
-    end 
+    end
   end
-  
   
   def method_missing( method, *arguments, &block )
 
-    self.configure unless @logger
+    @logger || configure
 
-    return unless( [:debug, :debug?, :info, :info?, :warn, :warn?, :error, :error?, :fatal].include?( method ) )
-    @logger.send( method, *arguments, &block )
+    if( [ :debug, :debug?, :info, :info?, :warn, :warn?, :error, :error?, :fatal ].include?( method ) )
+      @logger.send( method, *arguments, &block )
+    end
   end  
 end
