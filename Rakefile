@@ -1,29 +1,31 @@
-$:.unshift( File.join( File.dirname( __FILE__ ), 'lib' ) )
-
-
 begin
-  require 'version'
+  require 'jeweler'
+  require 'fileutils'
+  require 'file/tail'
+  require 'config_context'
+  require 'rake/runtest'
+  
 rescue LoadError => le
   fail( le.message )
 end
 
+$:.unshift( File.join( File.dirname( __FILE__ ), 'lib' ) )
 
-begin  
-  require 'metric_fu'  
+begin
+  require 'version'
+  
 rescue LoadError => le
-  fail( "You need metric_fu gem: #{le.message}" )
+  fail( "You need to declare the gem version in the file ./lib/version.rb (#{le.message})" )
 end
 
 
-desc "Clean all temporary stuffs"
+desc "Clean all temporary stuff..."
 task :clean do
   
-  begin
-    require 'fileutils'
-    
-    [ './tmp', './pkg' ].each { |dir| FileUtils.remove_dir( dir, true ) }
-  rescue LoadError => le
-    fail( "You need fileutils gem: #{e.message}" )
+  begin    
+    FileUtils.remove_dir( File.join( File.dirname( __FILE__ ), 'pkg' ), true )
+  rescue Exception => e
+    fail( e.message )
   end
 end
 
@@ -31,36 +33,28 @@ end
 desc "Build the gem"
 task :build =>[:clean] do
 
-  begin
-    require 'jeweler'
-  rescue LoadError => e
-    fail "Jeweler not available. Install it with: gem install jeweler( #{e.message} )"
-  end
-
   Jeweler::Tasks.new do |gemspec|
 
-    gemspec.name              = MiniLogger::Version::NAME
-    gemspec.version           = MiniLogger::Version::NUMBER
-    gemspec.rubyforge_project = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
+    gemspec.name              = Version::NAME
+    gemspec.version           = Version::NUMBER
+    gemspec.rubyforge_project = "http://github.com/jjuarez/#{Version::NAME}"
     gemspec.license           = 'MIT'
-    gemspec.summary           = 'A real simple logger utility'
-    gemspec.description       = 'My tiny logger'
+    gemspec.summary           = 'A tiny logger utility for small applications'
+    gemspec.description       = 'A minimal standard Logger wrapper perfect for minimal CLI applications'
     gemspec.email             = 'javier.juarez@gmail.com'
-    gemspec.homepage          = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
+    gemspec.homepage          = "http://github.com/jjuarez/#{Version::NAME}"
     gemspec.authors           = ['Javier Juarez']
-    gemspec.files             = Dir[ 'lib/**/*.rb' ] + Dir[ 'test/**/*rb' ]    
+    gemspec.files             = Dir[ 'lib/**/*.rb' ] + Dir[ 'test/**/*.rb' ]    
   end
-
-  Jeweler::GemcutterTasks.new
 end
 
 
 desc "Testing..."
-task :test => [:clean, :build] do 
+task :test => [:build] do 
 
-  require 'rake/runtest'
-  Rake.run_tests 'test/test_*.rb'
+  Rake.run_tests 'test/unit/test_*.rb'
 end
 
 
-task :default=>[:build]
+desc "The default task..."
+task :default=>[:test]
