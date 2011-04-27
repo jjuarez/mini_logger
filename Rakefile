@@ -3,7 +3,6 @@ begin
   require 'fileutils'
   require 'file/tail'
   require 'config_context'
-  require 'rake/runtest'
   
 rescue LoadError => le
   fail( le.message )
@@ -51,6 +50,7 @@ end
 
 desc "Testing..."
 task :test => [:build] do 
+  require 'rake/runtest'
 
   Rake.run_tests 'test/unit/test_*.rb'
 end
