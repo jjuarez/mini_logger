@@ -1,0 +1,3 @@
+---
+  :log_channel: '/tmp/mini_logger_test.log'
+  :log_level: 'debug'
