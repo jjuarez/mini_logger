@@ -1,12 +1,21 @@
 GEM
-  remote: http://gemcutter.org/
+  remote: http://rubygems.org/
   specs:
-    config_context (0.0.1)
-    mocha (0.9.12)
+    config_context (0.3.4)
+    file-tail (1.0.5)
+      spruz (>= 0.1.0)
+    git (1.2.5)
+    jeweler (1.5.2)
+      bundler (~> 1.0.0)
+      git (>= 1.2.5)
+      rake
+    rake (0.8.7)
+    spruz (0.2.5)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   config_context
-  mocha
+  file-tail
+  jeweler

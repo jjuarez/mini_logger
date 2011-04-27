@@ -1,1 +1,9 @@
-source 'http://gemcutter.org'
+source 'http://rubygems.org'
+
+gem 'jeweler'
+
+group :test do
+  
+  gem 'config_context'
+  gem 'file-tail'
+end
