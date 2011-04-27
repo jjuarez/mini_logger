@@ -3,10 +3,10 @@ module MiniLogger
     INFO = {
       :major =>0,
       :minor =>4,
-      :patch =>1
+      :patch =>2
     }
 
     NAME   = 'mini_logger'
-    NUMBER = INFO.values.join( '.' )
+    NUMBER = [INFO[:major], INFO[:minor], INFO[:patch]].values.join( '.' )
   end
 end
