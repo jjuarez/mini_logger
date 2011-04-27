@@ -6,11 +6,11 @@ module MiniLogger
   extend self
     
   LLM = {
-    :debug  =>Logger::DEBUG,
-    :info   =>Logger::INFO,
-    :warn   =>Logger::WARN,
-    :error  =>Logger::ERROR,
-    :faltal =>Logger::FATAL
+    :debug  =>::Logger::DEBUG,
+    :info   =>::Logger::INFO,
+    :warn   =>::Logger::WARN,
+    :error  =>::Logger::ERROR,
+    :faltal =>::Logger::FATAL
   }
   
   DEBUG = :debug
@@ -19,26 +19,35 @@ module MiniLogger
   ERROR = :error
   FATAL = :fatal
   
+  DEFAULT_LOG_CHANNEL = STDERR
+  DEFAULT_LOG_LEVEL   = DEBUG
+  VALID_METHODS       = [ :debug, :info, :warn, :error, :fatal, :debug?, :info?, :warn?, :error? ]
+  
   private
   def validate_log_level?( log_level )
+    
     LLM.has_key?( log_level )
   end
   
-  def get_log_level( log_level )
-    LLM[log_level]
-  end
-  
-  
+
   public
-  def configure( atts = { } )
+  def configure( attributes = { } )
     
-    @logger       = Logger.new( atts[:log_channel] ? atts[:log_channel] : STDERR )
-    @logger.level = validate_log_level?( atts[:log_level] ) ? get_log_level( atts[:log_level] ) : Logger::INFO
+    log_channel = attributes[:log_channel] ? attributes[:log_channel] : DEFAULT_LOG_CHANNEL
+    log_level   = attributes[:log_level] ? attributes[:log_level].to_sym : DEFAULT_LOG_LEVEL
+    
+    raise ArgumentError.new( "Invalid log level: #{log_level}" ) unless( validate_log_level?( log_level ) )  
+
+    @logger       = Logger.new( log_channel )
+    @logger.level = LLM[log_level]
+    
     self
   end
 
-  def level( ) 
+  def level( )
+    
     @logger || configure
+    
     @logger.level
   end  
   
@@ -47,18 +56,19 @@ module MiniLogger
     @logger || configure
     
     if( validate_log_level?( new_log_level ) )
-      @logger.level = get_log_level( new_log_level )
-    else  
+      
+      @logger.level = LLM[new_log_level]
+    else
+      
       raise ArgumentError.new( "Bad log level: #{new_log_level}" )
     end
   end
   
+  
   def method_missing( method, *arguments, &block )
 
     @logger || configure
-
-    if( [ :debug, :debug?, :info, :info?, :warn, :warn?, :error, :error?, :fatal ].include?( method ) )
-      @logger.send( method, *arguments, &block )
-    end
+    
+    @logger.send( method, *arguments, &block ) if( VALID_METHODS.include?( method ) )
   end  
 end
