@@ -58,7 +58,7 @@ end
 
 
 desc "Testing..."
-task :test => [:build] do
+task :test do
   require 'rake/runtest'
  
   Rake.run_tests 'test/unit/test_*.rb'
