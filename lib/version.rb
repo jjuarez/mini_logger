@@ -2,7 +2,7 @@ module Version
   INFO = {
     :major =>0,
     :minor =>4,
-    :patch =>2
+    :patch =>3
   }
 
   NAME   = 'mini_logger'

@@ -5,32 +5,39 @@ require 'logger'
 module MiniLogger
   extend self
     
-  LLM = {
-    :debug  =>::Logger::DEBUG,
-    :info   =>::Logger::INFO,
-    :warn   =>::Logger::WARN,
-    :error  =>::Logger::ERROR,
-    :faltal =>::Logger::FATAL
-  }
-  
   DEBUG = :debug
   INFO  = :info
   WARN  = :warn
   ERROR = :error
   FATAL = :fatal
+
+  LLM = {
+    :debug =>::Logger::DEBUG,
+    :info  =>::Logger::INFO,
+    :warn  =>::Logger::WARN,
+    :error =>::Logger::ERROR,
+    :fatal =>::Logger::FATAL
+  }  
+
+  RLLM = {
+    ::Logger::DEBUG => DEBUG,
+    ::Logger::INFO  => INFO,
+    ::Logger::WARN  => WARN,
+    ::Logger::ERROR => ERROR,
+    ::Logger::FATAL => FATAL
+  }  
   
   DEFAULT_LOG_CHANNEL = STDERR
   DEFAULT_LOG_LEVEL   = DEBUG
-  VALID_METHODS       = [ :debug, :info, :warn, :error, :fatal, :debug?, :info?, :warn?, :error? ]
+  VALID_METHODS       = [ :debug, :info, :warn, :error, :fatal, :debug?, :info?, :warn?, :error?, :fatal? ]
   
-  private
+  
   def validate_log_level?( log_level )
     
     LLM.has_key?( log_level )
   end
   
-
-  public
+  
   def configure( attributes = { } )
     
     log_channel = attributes[:log_channel] ? attributes[:log_channel] : DEFAULT_LOG_CHANNEL
@@ -40,16 +47,18 @@ module MiniLogger
 
     @logger       = Logger.new( log_channel )
     @logger.level = LLM[log_level]
-    
+
     self
   end
+
 
   def level( )
     
     @logger || configure
     
-    @logger.level
+    RLLM[@logger.level]
   end  
+
   
   def level=( new_log_level )
     

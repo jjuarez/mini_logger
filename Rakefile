@@ -1,13 +1,3 @@
-begin
-  require 'jeweler'
-  require 'fileutils'
-  require 'file/tail'
-  require 'config_context'
-  
-rescue LoadError => le
-  fail( le.message )
-end
-
 $:.unshift( File.join( File.dirname( __FILE__ ), 'lib' ) )
 
 begin
@@ -18,19 +8,23 @@ rescue LoadError => le
 end
 
 
-desc "Clean all temporary stuff..."
+desc "Clean all temporary stuff"
 task :clean do
+
+  require 'fileutils'
   
-  begin    
-    FileUtils.remove_dir( File.join( File.dirname( __FILE__ ), 'pkg' ), true )
-  rescue Exception => e
-    fail( e.message )
-  end
+  [ "coverage", "coverage.data", "pkg" ].each { |fd| FileUtils.rm_rf( fd ) }
 end
 
 
 desc "Build the gem"
 task :build =>[:clean] do
+  begin
+    require 'jeweler'
+
+  rescue LoadError => le
+    fail( le.message )
+  end
 
   Jeweler::Tasks.new do |gemspec|
 
@@ -39,17 +33,32 @@ task :build =>[:clean] do
     gemspec.rubyforge_project = "http://github.com/jjuarez/#{Version::NAME}"
     gemspec.license           = 'MIT'
     gemspec.summary           = 'A tiny logger utility for small applications'
-    gemspec.description       = 'A minimal standard Logger wrapper perfect for minimal CLI applications'
+    gemspec.description       = 'A minimal standard Logger wrapper perfect for CLI applications'
     gemspec.email             = 'javier.juarez@gmail.com'
     gemspec.homepage          = "http://github.com/jjuarez/#{Version::NAME}"
     gemspec.authors           = ['Javier Juarez']
     gemspec.files             = Dir[ 'lib/**/*.rb' ] + Dir[ 'test/**/*.rb' ]    
   end
 end
+ 
+
+desc "Measures unit test coverage"
+task :coverage=>[:clean] do
+
+  INCLUDE_DIRECTORIES = "lib:test"
+  
+  def run_coverage( files )
+
+    fail( "No files were specified for testing" ) if files.length == 0
+    sh "rcov --include #{INCLUDE_DIRECTORIES} --exclude gems/*,rubygems/* --sort coverage --aggregate coverage.data #{files.join( ' ' )}"
+  end
+
+  run_coverage Dir["test/**/*.rb"]
+end
 
 
 desc "Testing..."
-task :test => [:build] do 
+task :test => [:build] do
   require 'rake/runtest'
 
   Rake.run_tests 'test/unit/test_*.rb'

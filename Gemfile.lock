@@ -10,6 +10,7 @@ GEM
       git (>= 1.2.5)
       rake
     rake (0.8.7)
+    rcov (0.9.9)
     spruz (0.2.5)
 
 PLATFORMS
@@ -19,3 +20,4 @@ DEPENDENCIES
   config_context
   file-tail
   jeweler
+  rcov

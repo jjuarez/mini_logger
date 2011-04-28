@@ -1,3 +1,0 @@
----
-  :log_channel: '/tmp/mini_logger_bad_test.log'
-  :log_level: 'xxx'

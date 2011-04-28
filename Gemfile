@@ -1,9 +1,11 @@
 source 'http://rubygems.org'
 
-gem 'jeweler'
+group :development do
+  gem 'jeweler'
+end
 
 group :test do
   
-  gem 'config_context'
   gem 'file-tail'
+  gem 'rcov'
 end
