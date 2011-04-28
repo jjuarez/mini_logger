@@ -1,11 +1,8 @@
-$:.unshift( File.join( File.dirname( __FILE__ ), %w[.. lib test] ) )
-
-
 require 'rubygems'
 require 'shoulda'
 require 'file/tail'
 require 'mini_logger'
-require 'helpers/tail_file_helper'
+require File.join( File.dirname( __FILE__ ), %w[.. helpers tail_file_helper.rb] )
 
 
 class TestMiniLogger < Test::Unit::TestCase
