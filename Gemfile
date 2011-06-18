@@ -1,11 +1,10 @@
+# vim:ruby
 source 'http://rubygems.org'
 
-group :development do
-  gem 'jeweler'
-end
 
-group :test do
-  
+group :development do
+
+  gem 'jeweler'
   gem 'file-tail'
   gem 'rcov'
 end

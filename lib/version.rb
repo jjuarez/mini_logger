@@ -1,10 +1,14 @@
-module Version
-  INFO = {
-    :major =>0,
-    :minor =>4,
-    :patch =>3
-  }
+module MiniLogger
+  class Version
+  
+    INFO = {
+      :major =>0,
+      :minor =>5,
+      :patch =>0
+    }
 
-  NAME   = 'mini_logger'
-  NUMBER = [INFO[:major], INFO[:minor], INFO[:patch]].join( '.' )
+    NAME    = 'mini_logger'
+    NUMBER  = INFO.values.join('.')
+    VERSION = [NAME, NUMBER].join('-')
+  end
 end
