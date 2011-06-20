@@ -27,7 +27,9 @@ module MiniLogger
     ::Logger::ERROR => ERROR,
     ::Logger::FATAL => FATAL
   }  
-      
+  
+  @logger = nil
+
   def self.standarize_log_level(ll)
 
     case ll
@@ -93,6 +95,7 @@ module MiniLogger
   end
   
   def level!(nll)
+    
     if @logger
     
       raise ArgumentError.new("Invalid log level #{nll.class.name}:'#{nll}'") unless validate_log_level?(nll)
@@ -102,7 +105,8 @@ module MiniLogger
     end
   end
   
-  def level  
+  def level
+     
     RLLM[@logger.level] if @logger
   end
   

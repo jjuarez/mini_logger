@@ -4,7 +4,7 @@ module MiniLogger
     INFO = {
       :major =>0,
       :minor =>5,
-      :patch =>0
+      :patch =>1
     }
 
     NAME    = 'mini_logger'
