@@ -7,8 +7,18 @@ module MiniLogger
       :patch =>1
     }
 
+    def self.number(version_info=INFO)
+
+      if RUBY_VERSION =~ /1\.8\.\d/
+        [version_info[:major], version_info[:minor],version_info[:patch]].join('.')
+      else
+        version_info.values.join('.')
+      end
+    end
+
+
     NAME    = 'mini_logger'
-    NUMBER  = INFO.values.join('.')
+    NUMBER  = "#{number()}"  
     VERSION = [NAME, NUMBER].join('-')
   end
 end
