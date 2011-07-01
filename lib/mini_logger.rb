@@ -59,10 +59,10 @@ module MiniLogger
       when Hash                        
         configuration.merge!(arguments[0])
       else 
-        configuration = { :dev=>STDERR, :level=>:debug } 
+        configuration = { :dev=>STDERR, :level=>:debug }
     end
 
-    configuration.merge!({ :log_channel=>STDERR, :log_level=>:debug })  
+    configuration = { :log_channel=>STDERR, :log_level=>:info }.merge(configuration)  
       
     configuration[:dev]   = configuration[:log_channel] unless configuration[:dev]
     configuration[:level] = configuration[:log_level]   unless configuration[:level]   

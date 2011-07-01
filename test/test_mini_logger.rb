@@ -1,13 +1,11 @@
+$:.unshift(File.dirname(__FILE__))
+
 require 'rubygems'
 require 'tmpdir'
 require 'test/unit'
 require 'file/tail'
 require 'mini_logger'
-
-
-$:.unshift(File.join(File.dirname(__FILE__), %w[.. helpers]))
-
-require 'tail_file_helper'
+require 'helpers/tail_file_helper'
 
 
 class TestMiniLogger < Test::Unit::TestCase
@@ -17,18 +15,15 @@ class TestMiniLogger < Test::Unit::TestCase
   TEST_WARN_MESSAGE  = "warn"
   TEST_ERROR_MESSAGE = "error"
   TEST_FATAL_MESSAGE = "fatal"
-  
 
 
   def test_validate_log_level 
 
     [:debug, 'info', :warn, 'error', :fatal].each do |l|
-      
       assert(MiniLogger.validate_log_level?(l), "Log level:'#{l} not validated")
     end
     
     [:foo, 'bar', :bazz].each do |l|
-       
       assert(!MiniLogger.validate_log_level?(l), "Log level:'#{l} validated")
     end
   end
@@ -62,25 +57,24 @@ class TestMiniLogger < Test::Unit::TestCase
     
     ##
     # Old configuration interface
-    test_logger = MiniLogger.configure(:log_channel=>STDERR, :log_level=>:debug)
-    assert(test_logger.debug?, "Log level:'#{test_logger.level}'") 
+    test_logger = MiniLogger.configure(:log_channel=>STDERR, :log_level=>:info)
+    assert(test_logger.info?, "Log level:'#{test_logger.level}'") 
     
     ##
     # Mix configuration interface
-    test_logger = MiniLogger.configure(:log_channel=>STDERR, :level=>:debug)
-    assert(test_logger.debug?, "Log level:'#{test_logger.level}")
+    test_logger = MiniLogger.configure(:log_channel=>STDERR, :level=>:warn)
+    assert(test_logger.warn?, "Log level:'#{test_logger.level}")
     
     ##
     # Mix configuration interface
-    test_logger = MiniLogger.configure(:dev=>STDERR, :log_level=>:debug)
-    assert(test_logger.debug?, "Log level:'#{test_logger.level}")
+    test_logger = MiniLogger.configure(:dev=>STDERR, :log_level=>:error)
+    assert(test_logger.error?, "Log level:'#{test_logger.level}")
   end
   
   
   def test_raise_and_argument_error
 
     [:this, 'set', :of, 'log', :levels, 'are', :evil].each do |l|
-      
       assert_raise(ArgumentError) { MiniLogger.configure(:level=>l) }
     end
   end
@@ -88,7 +82,7 @@ class TestMiniLogger < Test::Unit::TestCase
 
   def test_create_a_logger_from_a_configuration_file
 
-    assert_equal(MiniLogger.configure(File.join(File.dirname(__FILE__), %w[.. fixtures test_config.yml])).level, MiniLogger::ERROR)
+    assert_equal(MiniLogger.configure(File.join(File.dirname(__FILE__), %w[fixtures test_config.yml])).level, MiniLogger::ERROR)
     assert_raise(Errno::ENOENT) { MiniLogger.configure("ThisFileDoNotExist.yml") }
   end
   
