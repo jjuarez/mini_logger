@@ -1,23 +1,23 @@
-$:.unshift(File.dirname(__FILE__))
+$:.unshift(File.join(File.dirname(__FILE__), '..'))
+$:.unshift(File.join(File.dirname(__FILE__), %w[.. lib]))
+
 
 require 'rubygems'
 require 'tmpdir'
-require 'test/unit'
+require 'delorean'
 require 'file/tail'
 require 'mini_logger'
+require 'test/unit_extensions'
 require 'helpers/tail_file_helper'
 
 
 class TestMiniLogger < Test::Unit::TestCase
   
-  TEST_DEBUG_MESSAGE = "debug"
-  TEST_INFO_MESSAGE  = "info"
-  TEST_WARN_MESSAGE  = "warn"
-  TEST_ERROR_MESSAGE = "error"
-  TEST_FATAL_MESSAGE = "fatal"
+  TEST_DATE_TIME = "05/11/1970 00:00"
+  TEST_MESSAGE   = "message"
 
 
-  def test_validate_log_level 
+  must "validate loglevel" do
 
     [:debug, 'info', :warn, 'error', :fatal].each do |l|
       assert(MiniLogger.validate_log_level?(l), "Log level:'#{l} not validated")
@@ -29,7 +29,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
 
 
-  def test_standarize_log_level 
+  must "standarize log level" do
 
     ['debug', 'DEBUG', 'DeBuG'].all? { |l| l == MiniLogger::DEBUG }
     ['debug', 'DEBUG', 'DeBuG'].map  { |l| l.to_sym }.all? { |l| l == MiniLogger::DEBUG }
@@ -48,7 +48,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
 
 
-  def test_create_a_logger_in_debug_level_by_default
+  must "create a logger in debug level by default" do
   
     ##
     # New configuration interface
@@ -72,7 +72,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  def test_raise_and_argument_error
+  must "raise and argument error" do
 
     [:this, 'set', :of, 'log', :levels, 'are', :evil].each do |l|
       assert_raise(ArgumentError) { MiniLogger.configure(:level=>l) }
@@ -80,14 +80,14 @@ class TestMiniLogger < Test::Unit::TestCase
   end
 
 
-  def test_create_a_logger_from_a_configuration_file
+  must "create a logger from a configuration file" do
 
     assert_equal(MiniLogger.configure(File.join(File.dirname(__FILE__), %w[fixtures test_config.yml])).level, MiniLogger::ERROR)
     assert_raise(Errno::ENOENT) { MiniLogger.configure("ThisFileDoNotExist.yml") }
   end
   
       
-  def test_file_confired_logger
+  must "confire various loggers" do
   
     test_logger = MiniLogger.configure    
     assert(test_logger.debug?)
@@ -115,7 +115,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  def test_change_log_levels 
+  must "change log levels" do
     
     test_logger = MiniLogger.configure(:dev=>STDERR, :level=>:debug)
     assert(test_logger.debug?)
@@ -132,7 +132,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  def test_not_change_to_invalid_log_level
+  must "not change to invalid log level" do
     
     test_logger = MiniLogger.configure
   
@@ -148,59 +148,32 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  def test_write_gte_debug_message 
+  must "write messages in diferents log levels" do
 
     log_file_name = File.join(Dir.tmpdir, 'mini_logger_test.log')
     test_logger   = MiniLogger.configure(:dev=>log_file_name, :level=>:debug)
     log_file      = TailFileHelper.new(log_file_name)
   
-    test_logger.debug(TEST_DEBUG_MESSAGE)
+    Delorean.time_travel_to(TEST_DATE_TIME)
+    test_logger.debug(TEST_MESSAGE)    
+    assert(log_file.get_log_line =~ /^D\, \[1970\-05\-11T00:00:\d{2}\.\d{6} #\d(.+){1} DEBUG \-\- : #{TEST_MESSAGE}/)
     
-    line = log_file.get_log_line
+    Delorean.time_travel_to(TEST_DATE_TIME)
+    test_logger.info(TEST_MESSAGE)
+    assert(log_file.get_log_line =~ /^I\, \[1970\-05\-11T00:00:\d{2}\.\d{6} #\d(.+){1}  INFO \-\- : #{TEST_MESSAGE}/)
 
-    skip( "I cant understand...") do
-      assert(
-        line =~ /^D\, \[\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6} #\d\] DEBUG \-\- : #{TEST_DEBUG_MESSAGE}/,
-        "The line is:'#{line}'"
-      )
-    end
-    
-    test_logger.info(TEST_INFO_MESSAGE)
+    Delorean.time_travel_to(TEST_DATE_TIME)
+    test_logger.warn(TEST_MESSAGE)
+    assert(log_file.get_log_line =~ /^W\, \[1970\-05\-11T00:00:\d{2}\.\d{6} #\d(.+){1}  WARN \-\- : #{TEST_MESSAGE}/)
+
+    Delorean.time_travel_to(TEST_DATE_TIME)
+    test_logger.error(TEST_MESSAGE)
+    assert(log_file.get_log_line =~ /^E\, \[1970\-05\-11T00:00:\d{2}\.\d{6} #\d(.+){1} ERROR \-\- : #{TEST_MESSAGE}/)
+
+    Delorean.time_travel_to(TEST_DATE_TIME)
+    test_logger.fatal(TEST_MESSAGE)
+    assert(log_file.get_log_line =~ /^F\, \[1970\-05\-11T00:00:\d{2}\.\d{6} #\d(.+){1} FATAL \-\- : #{TEST_MESSAGE}/)
   
-    line = log_file.get_log_line
-    
-    assert(
-      line =~ /^I\, \[\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6} #\d\]  INFO \-\- : #{TEST_INFO_MESSAGE}/,
-      "The line is:'#{line}'"
-    )
-    
-    test_logger.warn(TEST_WARN_MESSAGE)
-    
-    line = log_file.get_log_line
-  
-    assert(
-      line =~ /^W\, \[\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6} #\d\]  WARN \-\- : #{TEST_WARN_MESSAGE}/,
-      "The line is:'#{line}'"
-    )
-    
-    test_logger.error(TEST_ERROR_MESSAGE)
-    
-    line = log_file.get_log_line
-    
-    assert( 
-      line =~ /^E\, \[\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6} #\d\] ERROR \-\- : #{TEST_ERROR_MESSAGE}/,
-      "The line is:'#{line}'"
-    )
-    
-    test_logger.fatal(TEST_FATAL_MESSAGE)
-    
-    line = log_file.get_log_line
-    
-    assert(
-      line =~ /^F\, \[\d{4}\-\d{2}\-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6} #\d\] FATAL \-\- : #{TEST_FATAL_MESSAGE}/,
-      "The line is:'#{line}'"
-    )
-  
-    File.delete(TEST_LOG_FILE_NAME) if File.exist?(TEST_LOG_FILE_NAME)
+    File.delete(log_file_name) if File.exist? log_file_name
   end
 end
