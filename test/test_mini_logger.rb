@@ -8,7 +8,7 @@ require 'delorean'
 require 'file/tail'
 require 'mini_logger'
 require 'test/unit_extensions'
-require 'helpers/tail_file_helper'
+require 'test/helpers/tail_file_helper'
 
 
 class TestMiniLogger < Test::Unit::TestCase

@@ -60,7 +60,7 @@ desc "Testing..."
 task :test do
   require 'rake/runtest'
  
-  Rake.run_tests File.join(File.dirname(__FILE__), %w[test unit test_*.rb])
+  Rake.run_tests File.join(File.dirname(__FILE__), %w[test test_*.rb])
 end
 
 
