@@ -1,6 +1,6 @@
-require 'rubygems'
 require 'logger'
 require 'yaml'
+require 'forwardable'
 
 
 module MiniLogger
