@@ -1,5 +1,5 @@
 require 'rubygems'
-require'test/unit'
+require 'test/unit'
 
 
 module Test::Unit
