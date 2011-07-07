@@ -122,13 +122,21 @@ class TestMiniLogger < Test::Unit::TestCase
   
     test_logger.level = MiniLogger::ERROR
     assert test_logger.error?
-    assert_equal(test_logger.level, MiniLogger::ERROR)    
     
-    assert test_logger.level!(MiniLogger::DEBUG).debug? 
-    assert test_logger.level!(MiniLogger::INFO).info? 
-    assert test_logger.level!(MiniLogger::WARN).warn? 
-    assert test_logger.level!(MiniLogger::ERROR).error?  
-    assert test_logger.level!(MiniLogger::FATAL).fatal?
+    test_logger.level=MiniLogger::DEBUG 
+    assert test_logger.debug? 
+
+    test_logger.level=MiniLogger::INFO 
+    assert test_logger.info? 
+
+    test_logger.level=MiniLogger::WARN 
+    assert test_logger.warn? 
+
+    test_logger.level=MiniLogger::ERROR  
+    assert test_logger.error?  
+
+    test_logger.level=MiniLogger::FATAL
+    assert test_logger.fatal?
   end
   
   

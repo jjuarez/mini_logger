@@ -3,8 +3,10 @@ require 'yaml'
 require 'forwardable'
 
 
-module MiniLogger
-  extend self
+class MiniLogger
+  extend Forwardable
+  
+  def_delegators :@logger, :debug, :info, :warn, :error, :fatal, :debug?, :info?, :warn?, :error?, :fatal?
   
   DEBUG = :debug
   INFO  = :info
@@ -28,93 +30,72 @@ module MiniLogger
     ::Logger::FATAL => FATAL
   }  
   
-  @logger = nil
+  private
+  def self.standarize_log_level(level)
 
-  def self.standarize_log_level(ll)
-
-    case ll
-      when String then LLM[ll.downcase.to_sym]
-      when Symbol then LLM[ll.to_s.downcase.to_sym]
+    case level
+      when String then LLM[level.downcase.to_sym]
+      when Symbol then LLM[level.to_s.downcase.to_sym]
+      else ::Logger::INFO
     end
   end
       
       
-  def self.validate_log_level?(ll)
+  public    
+  def self.validate_log_level?(level)
     
-    case ll
-      when String then LLM.has_key?(ll.downcase.to_sym)
-      when Symbol then LLM.has_key?(ll.to_s.downcase.to_sym)
+    case level
+      when String then LLM.has_key?(level.downcase.to_sym)
+      when Symbol then LLM.has_key?(level.to_s.downcase.to_sym)
       else false
     end
   end
 
     
-  def configure(*arguments)
+  def self.configure(*arguments)
    
-    configuration = {}
+    configuration = Hash.new
     
     case arguments[0]
-      when String
-        configuration.merge!(YAML.load_file(arguments[0]))
-      when Hash                        
-        configuration.merge!(arguments[0])
-      else 
-        configuration = { :dev=>STDERR, :level=>:debug }
+      when String then configuration.merge!(YAML.load_file(arguments[0]))
+      when Hash   then configuration.merge!(arguments[0])
+      else configuration = { :dev=>STDERR, :level=>:debug }
     end
 
     configuration = { :log_channel=>STDERR, :log_level=>:info }.merge(configuration)  
       
-    configuration[:dev]   = configuration[:log_channel] unless configuration[:dev]
-    configuration[:level] = configuration[:log_level]   unless configuration[:level]   
+    configuration[:dev]   ||= configuration[:log_channel]
+    configuration[:level] ||= configuration[:log_level]   
     
     raise ArgumentError.new("Invalid log level") unless validate_log_level?(configuration[:level])
 
-    configuration[:dev] = case configuration[:dev]
-      when /(STDOUT|stdout)/ then STDOUT
-      when /(STDERR|stderr)/ then STDERR
-      when :stdout           then STDOUT
-      when :stderr           then STDERR
+    configuration[:dev] = case configuration[:dev].to_s.downcase
+      when /stdout/ then STDOUT
+      when /stderr/ then STDERR
       else configuration[:dev]
     end
 
-    @logger       = ::Logger.new(configuration[:dev])
-    @logger.level = standarize_log_level(configuration[:level])
+    self.new(configuration)
+  end
+  
+  def initialize(options)
     
+    @logger       = ::Logger.new(options[:dev])
+    @logger.level = MiniLogger.standarize_log_level(options[:level])
+    
+    self 
+  end
+  
+  def level=(level)
+    
+    raise ArgumentError.new("Invalid log level #{level.class.name}:'#{level}'") unless MiniLogger.validate_log_level?(level)
+    @logger.level = MiniLogger.standarize_log_level(level)
+
     self
-  end
-  
-  def level=(nll)
-    
-    if @logger
-    
-      raise ArgumentError.new("Invalid log level #{nll.class.name}:'#{nll}'") unless validate_log_level?(nll)
-      @logger.level = standarize_log_level(nll)
-      
-      self
-    end
-  end
-  
-  def level!(nll)
-    
-    if @logger
-    
-      raise ArgumentError.new("Invalid log level #{nll.class.name}:'#{nll}'") unless validate_log_level?(nll)
-      @logger.level = standarize_log_level(nll)
-      
-      self
-    end
   end
   
   def level
      
-    RLLM[@logger.level] if @logger
+    RLLM[@logger.level]
   end
-  
-  def method_missing(method, *arguments, &block)
-   
-    if @logger && [:debug, :info, :warn, :error, :fatal, :debug?, :info?, :warn?, :error?, :fatal?].include?(method)
-
-      @logger.send(method, *arguments, &block)
-    end
-  end  
 end
