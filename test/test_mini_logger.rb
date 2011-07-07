@@ -1,7 +1,6 @@
 $:.unshift(File.join(File.dirname(__FILE__), '..'))
 $:.unshift(File.join(File.dirname(__FILE__), %w[.. lib]))
 
-
 require 'rubygems'
 require 'tmpdir'
 require 'delorean'
@@ -61,13 +60,8 @@ class TestMiniLogger < Test::Unit::TestCase
     assert(test_logger.info?, "Log level:'#{test_logger.level}'") 
     
     ##
-    # Mix configuration interface
-    test_logger = MiniLogger.configure(:log_channel=>STDERR, :level=>:warn)
-    assert(test_logger.warn?, "Log level:'#{test_logger.level}")
-    
-    ##
-    # Mix configuration interface
-    test_logger = MiniLogger.configure(:dev=>STDERR, :log_level=>:error)
+    # New configuration interface
+    test_logger = MiniLogger.configure(:dev=>STDERR, :level=>:error)
     assert(test_logger.error?, "Log level:'#{test_logger.level}")
   end
   

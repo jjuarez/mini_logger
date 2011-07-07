@@ -36,7 +36,6 @@ class MiniLogger
     case level
       when String then LLM[level.downcase.to_sym]
       when Symbol then LLM[level.to_s.downcase.to_sym]
-      else ::Logger::INFO
     end
   end
       

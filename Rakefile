@@ -36,32 +36,25 @@ task :build =>:clean do
     gemspec.email             = 'javier.juarez@gmail.com'
     gemspec.homepage          = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
     gemspec.authors           = ['Javier Juarez']
-    gemspec.files             = Dir[ 'lib/**/*.rb' ] + Dir[ 'test/**/*.rb' ]    
+    gemspec.files             = Dir['lib/**/*.rb'] + Dir['test/**/*.rb']    
   end
 end
  
 
 desc "Measures unit test coverage"
 task :coverage=>:clean do
-
-  INCLUDE_DIRECTORIES = "lib:test"
+  require 'rcov'
   
-  def run_coverage( files )
-
-    fail( "No files were specified for testing" ) if files.length == 0
-    sh "rcov --include #{INCLUDE_DIRECTORIES} --exclude gems/*,rubygems/* --sort coverage --aggregate coverage.data #{files.join( ' ' )}"
-  end
-
-  run_coverage Dir["test/**/*.rb"]
+  system("rcov --include lib:test --exclude gems/* --sort coverage --aggregate coverage.data #{Dir['test/**/*.rb'].join(' ')}")
 end
 
 
-desc "Testing..."
-task :test do
-  require 'rake/runtest'
- 
-  Rake.run_tests File.join(File.dirname(__FILE__), %w[test test_*.rb])
-end
+require 'rake/testtask'
+Rake::TestTask.new(:test) do |test|
 
+  test.libs << 'lib' << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = false
+end
 
 task :default=>:test

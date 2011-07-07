@@ -4,7 +4,7 @@ module MiniLogger
     INFO = {
       :major =>0,
       :minor =>6,
-      :patch =>0
+      :patch =>1
     }
 
     def self.number(version_info=INFO)
