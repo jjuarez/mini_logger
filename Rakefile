@@ -1,60 +1,53 @@
-$:.unshift(File.join(File.dirname(__FILE__), 'lib'))
+# encoding: utf-8
 
+require 'rubygems'
+require 'bundler'
 begin
-  require 'version'
-  
-rescue LoadError => le
-  fail("You need to declare the gem version in the file ./lib/version.rb (#{le.message})")
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
 end
+require 'rake'
 
+require 'jeweler'
+Jeweler::Tasks.new do |gem|
 
-desc "Clean all temporary stuff"
-task :clean do
-  require 'fileutils'
-  
-  ["coverage", "coverage.data", "pkg"].each { |fd| FileUtils.rm_rf(fd) }
+  gem.name        = "mini_logger"
+  gem.homepage    = "http://github.com/jjuarez/mini_logger"
+  gem.license     = "MIT"
+  gem.summary     = 'A tiny logger utility for small applications'
+  gem.description = 'A minimal standard Logger wrapper perfect for CLI applications'
+  gem.email       = "javier.juarez@gmail.com"
+  gem.authors     = ["Javier Juarez"]
+  # dependencies defined in Gemfile
 end
-
-
-desc "Build the gem"
-task :build =>:clean do
-  begin
-    require 'jeweler'
-
-  rescue LoadError=>e
-    fail(e.message)
-  end
-
-  Jeweler::Tasks.new do |gemspec|
-
-    gemspec.name              = MiniLogger::Version::NAME
-    gemspec.version           = MiniLogger::Version::NUMBER
-    gemspec.rubyforge_project = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
-    gemspec.license           = 'MIT'
-    gemspec.summary           = 'A tiny logger utility for small applications'
-    gemspec.description       = 'A minimal standard Logger wrapper perfect for CLI applications'
-    gemspec.email             = 'javier.juarez@gmail.com'
-    gemspec.homepage          = "http://github.com/jjuarez/#{MiniLogger::Version::NAME}"
-    gemspec.authors           = ['Javier Juarez']
-    gemspec.files             = Dir['lib/**/*.rb'] + Dir['test/**/*.rb']    
-  end
-end
- 
-
-desc "Measures unit test coverage"
-task :coverage=>:clean do
-  require 'rcov'
-  
-  system("rcov --include lib:test --exclude gems/* --sort coverage --aggregate coverage.data #{Dir['test/**/*.rb'].join(' ')}")
-end
-
+Jeweler::RubygemsDotOrgTasks.new
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
-
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/test_*.rb'
-  test.verbose = false
+  test.verbose = true
 end
 
-task :default=>:test
+require 'rcov/rcovtask'
+Rcov::RcovTask.new do |test|
+  test.libs << 'test'
+  test.pattern = 'test/**/test_*.rb'
+  test.verbose = true
+  test.rcov_opts << '--exclude "gems/*"'
+end
+
+task :default => :test
+
+require 'rake/rdoctask'
+Rake::RDocTask.new do |rdoc|
+  version = File.exist?('VERSION') ? File.read('VERSION') : ""
+
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title = "gema #{version}"
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+end

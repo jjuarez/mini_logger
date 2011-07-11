@@ -1,14 +1,11 @@
-# vim:ruby
-source 'http://rubygems.org'
-
-group :test do
-
-  gem 'file-tail'
-  gem 'delorean'
-end
+source "http://rubygems.org"
 
 group :development do
 
-  gem 'jeweler'
-  gem 'rcov'
+  gem 'file-tail'
+  gem 'delorean'
+  gem "shoulda", ">= 0"
+  gem "bundler", "~> 1.0.0"
+  gem "jeweler", "~> 1.6.4"
+  gem "rcov", ">= 0"
 end

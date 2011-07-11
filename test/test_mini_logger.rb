@@ -1,13 +1,9 @@
-$:.unshift(File.join(File.dirname(__FILE__), '..'))
-$:.unshift(File.join(File.dirname(__FILE__), %w[.. lib]))
-
-require 'rubygems'
+require 'helper'
 require 'tmpdir'
 require 'delorean'
 require 'file/tail'
 require 'mini_logger'
-require 'test/unit_extensions'
-require 'test/helpers/tail_file_helper'
+require 'helpers/tail_file_helper'
 
 
 class TestMiniLogger < Test::Unit::TestCase
@@ -16,7 +12,7 @@ class TestMiniLogger < Test::Unit::TestCase
   TEST_MESSAGE   = "message"
 
 
-  must "validate loglevel" do
+  should "validate loglevel" do
 
     [:debug, 'info', :warn, 'error', :fatal].each do |l|
       assert(MiniLogger.validate_log_level?(l), "Log level:'#{l} not validated")
@@ -28,7 +24,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
 
 
-  must "standarize log level" do
+  should "standarize log level" do
 
     ['debug', 'DEBUG', 'DeBuG'].all? { |l| l == MiniLogger::DEBUG }
     ['debug', 'DEBUG', 'DeBuG'].map  { |l| l.to_sym }.all? { |l| l == MiniLogger::DEBUG }
@@ -47,7 +43,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
 
 
-  must "create a logger in debug level by default" do
+  should "create a logger in debug level by default" do
   
     ##
     # New configuration interface
@@ -66,7 +62,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  must "raise and argument error" do
+  should "raise and argument error" do
 
     [:this, 'set', :of, 'log', :levels, 'are', :evil].each do |l|
       assert_raise(ArgumentError) { MiniLogger.configure(:level=>l) }
@@ -74,14 +70,14 @@ class TestMiniLogger < Test::Unit::TestCase
   end
 
 
-  must "create a logger from a configuration file" do
+  should "create a logger from a configuration file" do
 
     assert_equal(MiniLogger.configure(File.join(File.dirname(__FILE__), %w[fixtures test_config.yml])).level, MiniLogger::ERROR)
     assert_raise(Errno::ENOENT) { MiniLogger.configure("ThisFileDoNotExist.yml") }
   end
   
       
-  must "confire various loggers" do
+  should "confire various loggers" do
   
     test_logger = MiniLogger.configure    
     assert(test_logger.debug?)
@@ -109,7 +105,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  must "change log levels" do
+  should "change log levels" do
     
     test_logger = MiniLogger.configure(:dev=>STDERR, :level=>:debug)
     assert(test_logger.debug?)
@@ -134,7 +130,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  must "not change to invalid log level" do
+  should "not change to invalid log level" do
     
     test_logger = MiniLogger.configure
   
@@ -150,7 +146,7 @@ class TestMiniLogger < Test::Unit::TestCase
   end
   
   
-  must "write messages in diferents log levels" do
+  should "write messages in diferents log levels" do
 
     log_file_name = File.join(Dir.tmpdir, 'mini_logger_test.log')
     test_logger   = MiniLogger.configure(:dev=>log_file_name, :level=>:debug)
